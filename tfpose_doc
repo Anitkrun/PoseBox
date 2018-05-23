@@ -1,6 +1,7 @@
 
 */
-  Openpose implemented via tensorflow
+  Openpose implemented via tensorflow, contains instructions to put up a tensorflow implemetation of openpose library. 
+  For specifications refer to openpose_doc.
  */
 
 Requirements:
