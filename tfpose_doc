@@ -14,12 +14,13 @@ $ git clone https://www.github.com/ildoonet/tf-openpose
 $ cd tf-openpose
 $ pip3 install -r requirements.txt
 
-Note: To detect the 2D pose of multiple people in an image, a nonparametric representation referred to as Part Affinity Fields 
+Important: To detect the 2D pose of multiple people in an image, a nonparametric representation referred to as Part Affinity Fields 
      (PAFs) is used. Post-processing for Part-Affinity Fields Map is implemented in C++ & Swig and is needed for PAF generation 
      during detection.
      i.e.
      - install swig
      - $swig -python -c++ pafprocess.i && python3 setup.py build_ext --inplace
+     
      
 Running an example:
 
@@ -27,3 +28,9 @@ Execute from ./tf-openpose/src/
 
 $ python3 run.py --model=mobilenet_thin --resize=432x368 --image=<path_to_image>/<name_of_image>
 substitute --model=<model_of _your_choice>
+
+Notes:
+
+- solution reproduced in a python virtual environment ; pip breaks in ubuntu 16 on upgrading pip which is necessary for 
+  some dependancies.
+
