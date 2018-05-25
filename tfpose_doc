@@ -43,7 +43,7 @@ Notes:
      - limbs obscured by other limbs
      - false/incorrect detections caused by missing limbs
      - occasional connection associating parts from two persons, usually a consequence of proximity
-     - the demo doesn't support a video demonstration
+     
   
   Pose related functions of tf-Openpose library:
   
