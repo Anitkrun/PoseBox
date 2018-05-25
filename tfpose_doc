@@ -33,7 +33,6 @@ Notes:
 
 - solution reproduced in a python virtual environment ; pip breaks in ubuntu 16 on upgrading pip which is necessary for 
   some dependancies.
--   
   
   Failure cases:
      - part detections shared by two persons
