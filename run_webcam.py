@@ -5,8 +5,8 @@ import time
 import cv2
 import numpy as np
 
-from estimator import TfPoseEstimator
-from networks import get_graph_path, model_wh
+from tf_pose.estimator import TfPoseEstimator
+from tf_pose.networks import get_graph_path, model_wh
 
 logger = logging.getLogger('TfPoseEstimator-WebCam')
 logger.setLevel(logging.DEBUG)
@@ -48,7 +48,7 @@ if __name__ == '__main__':
         ret_val, image = cam.read()
 
         logger.debug('image process+')
-        humans = e.inference(image)
+        humans = e.inference(image, resize_to_default=(w > 0 and h > 0), upsample_size=args.resize_out_ratio)
 
         logger.debug('postprocess+')
         image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)

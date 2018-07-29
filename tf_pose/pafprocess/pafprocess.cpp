@@ -12,7 +12,7 @@ using namespace std;
 vector<vector<float> > subset;
 vector<Peak> peak_infos_line;
 
-int round(float v);
+int roundpaf(float v);
 vector<VectorXY> get_paf_vectors(float *pafmap, const int& ch_id1, const int& ch_id2, int& f2, int& f3, Peak& peak1, Peak& peak2);
 bool comp_candidate(ConnectionCandidate a, ConnectionCandidate b);
 
@@ -50,7 +50,7 @@ int process_paf(int p1, int p2, int p3, float *peaks, int h1, int h2, int h3, fl
         vector<Peak>& peak_a_list = peak_infos[COCOPAIRS[pair_id][0]];
         vector<Peak>& peak_b_list = peak_infos[COCOPAIRS[pair_id][1]];
 
-        if (peak_a_list.size() == 0 or peak_b_list.size() == 0) {
+        if (peak_a_list.size() == 0 || peak_b_list.size() == 0) {
             continue;
         }
 
@@ -82,7 +82,7 @@ int process_paf(int p1, int p2, int p3, float *peaks, int h1, int h2, int h3, fl
 
                 float criterion2 = scores / STEP_PAF + min(0.0, 0.5 * h1 / norm - 1.0);
 
-                if (criterion1 > THRESH_VECTOR_CNT1 and criterion2 > 0) {
+                if (criterion1 > THRESH_VECTOR_CNT1 && criterion2 > 0) {
                     ConnectionCandidate candidate;
                     candidate.idx1 = peak_a_id;
                     candidate.idx2 = peak_b_id;
@@ -135,7 +135,7 @@ int process_paf(int p1, int p2, int p3, float *peaks, int h1, int h2, int h3, fl
             int found = 0;
             int subset_idx1=0, subset_idx2=0;
             for (int subset_id = 0; subset_id < (int) subset.size(); subset_id ++) {
-                if (subset[subset_id][part_id1] == conns[conn_id].cid1 or subset[subset_id][part_id2] == conns[conn_id].cid2) {
+                if (subset[subset_id][part_id1] == conns[conn_id].cid1 || subset[subset_id][part_id2] == conns[conn_id].cid2) {
                     if (found == 0) subset_idx1 = subset_id;
                     if (found == 1) subset_idx2 = subset_id;
                     found += 1;
@@ -151,7 +151,7 @@ int process_paf(int p1, int p2, int p3, float *peaks, int h1, int h2, int h3, fl
             } else if (found == 2) {
                 int membership;
                 for (int subset_id = 0; subset_id < 18; subset_id ++) {
-                    if (subset[subset_idx1][subset_id] > 0 and subset[subset_idx2][subset_id] > 0) {
+                    if (subset[subset_idx1][subset_id] > 0 && subset[subset_idx2][subset_id] > 0) {
                         membership = 2;
                     }
                 }
@@ -220,8 +220,8 @@ vector<VectorXY> get_paf_vectors(float *pafmap, const int& ch_id1, const int& ch
     const float STEP_Y = (peak2.y - peak1.y) / float(STEP_PAF);
 
     for (int i = 0; i < STEP_PAF; i ++) {
-        int location_x = round(peak1.x + i * STEP_X);
-        int location_y = round(peak1.y + i * STEP_Y);
+        int location_x = roundpaf(peak1.x + i * STEP_X);
+        int location_y = roundpaf(peak1.y + i * STEP_Y);
 
         VectorXY v;
         v.x = PAF(location_y, location_x, ch_id1);
@@ -232,7 +232,7 @@ vector<VectorXY> get_paf_vectors(float *pafmap, const int& ch_id1, const int& ch
     return paf_vectors;
 }
 
-int round(float v) {
+int roundpaf(float v) {
     return (int) (v + 0.5);
 }
 

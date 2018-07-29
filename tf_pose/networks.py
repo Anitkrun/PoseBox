@@ -1,11 +1,12 @@
 import os
+from os.path import dirname, abspath
 
 import tensorflow as tf
-from network_mobilenet import MobilenetNetwork
-from network_mobilenet_thin import MobilenetNetworkThin
+from tf_pose.network_mobilenet import MobilenetNetwork
+from tf_pose.network_mobilenet_thin import MobilenetNetworkThin
 
-from network_cmu import CmuNetwork
-from network_personlab import PersonLabNetwork
+from tf_pose.network_cmu import CmuNetwork
+from tf_pose.network_personlab import PersonLabNetwork
 
 
 def _get_base_path():
@@ -75,14 +76,20 @@ def get_network(type, placeholder_input, sess_for_load=None, trainable=True):
 
 def get_graph_path(model_name):
     dyn_graph_path = {
-        'cmu': './models/graph/cmu/graph_opt.pb',
-        'mobilenet_thin': './models/graph/mobilenet_thin/graph_opt.pb'
+        'cmu': 'graph/cmu/graph_opt.pb',
+        'mobilenet_thin': 'graph/mobilenet_thin/graph_opt.pb'
     }
-    graph_path = dyn_graph_path[model_name]
-    for path in (graph_path, os.path.join(os.path.dirname(os.path.abspath(__file__)), graph_path), os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', graph_path)):
-        if not os.path.isfile(path):
-            continue
-        return path
+
+    base_data_dir = dirname(dirname(abspath(__file__)))
+    if os.path.exists(os.path.join(base_data_dir, 'models')):
+        base_data_dir = os.path.join(base_data_dir, 'models')
+    else:
+        base_data_dir = os.path.join(base_data_dir, 'tf_pose_data')
+
+    graph_path = os.path.join(base_data_dir, dyn_graph_path[model_name])
+    if os.path.isfile(graph_path):
+        return graph_path
+
     raise Exception('Graph file doesn\'t exist, path=%s' % graph_path)
 
 
