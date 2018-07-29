@@ -15,19 +15,19 @@ You need dependencies below.
 - slim
 - slidingwindow
   - https://github.com/adamrehn/slidingwindow
-  - I copied from the above git repo to modify few things.
+ 
 
 ### Install
 
 Clone the repo and install 3rd-party libraries.
 
 ```bash
-$ git clone https://www.github.com/ildoonet/tf-openpose
+$ git clone https://www.github.com/arnitkun/PoseBox
 $ cd tf-openpose
 $ pip3 install -r requirements.txt
 ```
 
-Build c++ library for post processing. See : https://github.com/ildoonet/tf-pose-estimation/tree/master/tf_pose/pafprocess
+Build c++ library for post processing. See : https://github.com/arnitkun/PoseBox/tree/master/tf_pose/pafprocess
 ```
 $ cd tf_pose/pafprocess
 $ swig -python -c++ pafprocess.i && python3 setup.py build_ext --inplace
@@ -38,8 +38,8 @@ $ swig -python -c++ pafprocess.i && python3 setup.py build_ext --inplace
 Alternatively, you can install this repo as a shared package using pip.
 
 ```bash
-$ git clone https://www.github.com/ildoonet/tf-openpose
-$ cd tf-openpose
+$ git clone https://www.github.com/arnitkun/PoseBox
+$ cd PoseBox
 $ python setup.py install
 ```
 
