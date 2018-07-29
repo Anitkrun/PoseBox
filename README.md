@@ -43,4 +43,4 @@ $ cd PoseBox
 $ python setup.py install
 ```
 
-Original Repo [tf-pose-estimation] : (https://github.com/ildoonet/tf-pose-estimation)
+Original Repo [tf-pose-estimation] : https://github.com/ildoonet/tf-pose-estimation
