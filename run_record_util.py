@@ -1,7 +1,9 @@
 import argparse
 import logging
+import ntpath
 import os
 import pickle
+import signal
 import sys
 import time
 
@@ -27,7 +29,7 @@ def getArgs():
     parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin')
     parser.add_argument('--resolution', type=str, default='432x368', help='network input resolution. default=432x368')
     parser.add_argument('--output', type=str, default='./processed/', help='output dir to write inference data to.')
-    parser.add_argument('--mode', type=str, default='play', help='record / play / heatmap')
+    parser.add_argument('--mode', type=str, default='record', help='record / play')
 
     parser.add_argument('--show-process', type=bool, default=False,
                         help='for debug purpose, if enabled, speed for inference is dropped.')
@@ -39,12 +41,26 @@ def getArgs():
 
     return args
 
-def record(e, in_file, args):
+def getFileName(path):
+    fname = ntpath.basename(path)
+    return fname.split('.')[0]
+
+out_data = {}
+out_file_path = ''
+
+def pickleData():
+    with open(out_file_path, 'wb') as f:
+        pickle.dump(out_data, f, pickle.HIGHEST_PROTOCOL)
+
+def record(args):
 
     # Open output file:
     """
         Output filename: <in_filename>_<model_name>
     """
+    global out_data, out_file_path
+
+    in_file = getFileName(args.video)
     out_file = ''.join([in_file, '_', args.model])
     out_file_path = os.path.join(args.output, out_file)
 
@@ -52,8 +68,9 @@ def record(e, in_file, args):
     #with open(outfile, 'wb') as f:
     frame_idx = 0
     det_frame = 0
-    out_data = {}
 
+    w, h = model_wh(args.resolution)
+    e = TfPoseEstimator(get_graph_path(args.model), target_size=(w, h))
     cap = cv2.VideoCapture(args.video)
 
     if cap.isOpened() is False:
@@ -83,11 +100,11 @@ def record(e, in_file, args):
     cap.release()
 
     logger.info('Writing data to %s' % out_file)
-    with open(out_file_path, 'wb') as f:
-        pickle.dump(out_data, f, pickle.HIGHEST_PROTOCOL)
+    pickleData()
 
-def play(in_file, args):
-    data_in = {}
+def play(args):
+    in_data = {}
+    in_file = getFileName(args.video)
     data_file = ''.join([in_file, '_', args.model])
     data_file_path = os.path.join(args.output, data_file)
 
@@ -96,7 +113,7 @@ def play(in_file, args):
         sys.exit(-1)
     
     with open(data_file_path, 'rb') as f:
-        data_in = pickle.load(f)
+        in_data = pickle.load(f)
     
     frame_idx = 0
     
@@ -110,8 +127,8 @@ def play(in_file, args):
             logger.error('Image can not be read, path=%s' % args.image)
             sys.exit(-1)
         
-        if frame_idx in data_in.keys():
-            humans = data_in[frame_idx]
+        if frame_idx in in_data.keys():
+            humans = in_data[frame_idx]
             if not args.showBG:
                 image = np.zeros(image.shape)
             image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
@@ -125,7 +142,12 @@ def play(in_file, args):
     cap.release()
     cv2.destroyAllWindows()
 
-logger = getLogger('TfPoseEstimator-Stub')
+def sigint_handler(sig, frame):
+    logger.info('Writing data to %s' % out_file_path)
+    pickleData()
+    sys.exit(0)
+
+logger = getLogger('TfPoseEstimator-RecUtil')
 
 if __name__ == '__main__':
 
@@ -136,9 +158,8 @@ if __name__ == '__main__':
     args = getArgs()
 
     if args.mode == 'record':
-        w, h = model_wh(args.resolution)
-        e = TfPoseEstimator(get_graph_path(args.model), target_size=(w, h))
-        record(e, 'video1', args)
+        signal.signal(signal.SIGINT, sigint_handler)
+        record(args)
 
     if args.mode == 'play':
-        play('video1', args)
+        play(args)
