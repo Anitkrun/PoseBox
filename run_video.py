@@ -20,6 +20,11 @@ fps_time = 0
 
 
 if __name__ == '__main__':
+
+    """
+        Run pose estimation on a video.
+    """
+
     parser = argparse.ArgumentParser(description='tf-pose-estimation Video')
     parser.add_argument('--video', type=str, default='')
     parser.add_argument('--resolution', type=str, default='432x368', help='network input resolution. default=432x368')

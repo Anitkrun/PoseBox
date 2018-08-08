@@ -20,6 +20,11 @@ fps_time = 0
 
 
 if __name__ == '__main__':
+
+    """
+        Run pose estimation realtime on a webcam.
+    """
+
     parser = argparse.ArgumentParser(description='tf-pose-estimation realtime webcam')
     parser.add_argument('--camera', type=int, default=0)
 
@@ -40,20 +45,20 @@ if __name__ == '__main__':
     else:
         e = TfPoseEstimator(get_graph_path(args.model), target_size=(432, 368))
     logger.debug('cam read+')
-    cam = cv2.VideoCapture(args.camera)
+    cam = cv2.VideoCapture('./videos/video1.mp4')#args.camera)
     ret_val, image = cam.read()
     logger.info('cam image=%dx%d' % (image.shape[1], image.shape[0]))
 
     while True:
         ret_val, image = cam.read()
 
-        logger.debug('image process+')
+        #logger.debug('image process+')
         humans = e.inference(image, resize_to_default=(w > 0 and h > 0), upsample_size=args.resize_out_ratio)
 
-        logger.debug('postprocess+')
+        #logger.debug('postprocess+')
         image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
 
-        logger.debug('show+')
+        #logger.debug('show+')
         cv2.putText(image,
                     "FPS: %f" % (1.0 / (time.time() - fps_time)),
                     (10, 10),  cv2.FONT_HERSHEY_SIMPLEX, 0.5,
@@ -62,6 +67,6 @@ if __name__ == '__main__':
         fps_time = time.time()
         if cv2.waitKey(1) == 27:
             break
-        logger.debug('finished+')
+        #logger.debug('finished+')
 
     cv2.destroyAllWindows()

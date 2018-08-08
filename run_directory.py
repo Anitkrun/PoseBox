@@ -9,11 +9,11 @@ import dill
 import common
 import cv2
 import numpy as np
-from estimator import TfPoseEstimator
-from networks import get_graph_path, model_wh
+from tf_pose.estimator import TfPoseEstimator
+from tf_pose.networks import get_graph_path, model_wh
 
-from lifting.prob_model import Prob3dPose
-from lifting.draw import plot_pose
+#from lifting.prob_model import Prob3dPose
+#from lifting.draw import plot_pose
 
 logger = logging.getLogger('TfPoseEstimator')
 logger.setLevel(logging.DEBUG)
@@ -25,6 +25,12 @@ logger.addHandler(ch)
 
 
 if __name__ == '__main__':
+
+    """
+        Run pose estimation on a directory of images.
+    """
+
+
     parser = argparse.ArgumentParser(description='tf-pose-estimation run by folder')
     parser.add_argument('--folder', type=str, default='./images/')
     parser.add_argument('--resolution', type=str, default='432x368', help='network input resolution. default=432x368')
