@@ -104,17 +104,19 @@ ENV/
 *ckpt*
 *.npy
 timeline*.json
+*.pb
+*.pbtxt
 
 # project customs 
 tmp
-models/graph/cmu*/*.pb
-models/trained/*/checkpoint
-models/trained/*/*.pb
-models/trained/*/model-*.data-*
-models/trained/*/model-*.index
-models/trained/*/model-*.meta
-models/pretrained/resnet_v2_101/eval.graph
-models/pretrained/resnet_v2_101/train.graph
+_models/graph/cmu*/*.pb
+_models/trained/*/checkpoint
+_models/trained/*/*.pb
+_models/trained/*/model-*.data-*
+_models/trained/*/model-*.index
+_models/trained/*/model-*.meta
+_models/pretrained/resnet_v2_101/eval.graph
+_models/pretrained/resnet_v2_101/train.graph
 src/pafprocess/pafprocess.py
 src/pafprocess/pafprocess_wrap.cpp
 src/pafprocess/pafprocess_wrap.cxx
