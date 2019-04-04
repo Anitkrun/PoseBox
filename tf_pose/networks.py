@@ -81,8 +81,8 @@ def get_graph_path(model_name):
     }
 
     base_data_dir = dirname(dirname(abspath(__file__)))
-    if os.path.exists(os.path.join(base_data_dir, 'models')):
-        base_data_dir = os.path.join(base_data_dir, 'models')
+    if os.path.exists(os.path.join(base_data_dir, '_models')):
+        base_data_dir = os.path.join(base_data_dir, '_models')
     else:
         base_data_dir = os.path.join(base_data_dir, 'tf_pose_data')
 

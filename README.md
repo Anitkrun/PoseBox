@@ -15,34 +15,18 @@ You need dependencies below.
 - slim
 - slidingwindow
   - https://github.com/adamrehn/slidingwindow
+
+## TF-Pose/Posenet branch
+
+The branch named tfpose+posenet-py contains both modules, tf-pose and posenet python.
+Refer to the following files to find usage.
+```
+run_webcam_posenet.py
+run_webcam_tf_pose.py
+```
  
+Original Repos
+- [tf-pose-estimation] : https://github.com/ildoonet/tf-pose-estimation
+- [posenet-python] : https://github.com/rwightman/posenet-python
 
-### Install
 
-Clone the repo and install 3rd-party libraries.
-
-```bash
-$ git clone https://www.github.com/arnitkun/PoseBox
-$ cd tf-openpose
-$ pip3 install -r requirements.txt
-```
-
-Build c++ library for post processing. See : https://github.com/arnitkun/PoseBox/tree/master/tf_pose/pafprocess
-```
-$ cd tf_pose/pafprocess
-$ swig -python -c++ pafprocess.i && python3 setup.py build_ext --inplace
-```
-
-### Package Install
-
-Alternatively, you can install this repo as a shared package using pip.
-
-```bash
-$ git clone https://www.github.com/arnitkun/PoseBox
-$ cd PoseBox
-$ python setup.py install
-```
-
-**Stuff to be added**
-
-Original Repo [tf-pose-estimation] : https://github.com/ildoonet/tf-pose-estimation
