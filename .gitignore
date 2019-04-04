@@ -102,7 +102,7 @@ ENV/
 
 # models
 *ckpt*
-*.npy
+#*.npy
 timeline*.json
 *.pb
 *.pbtxt
