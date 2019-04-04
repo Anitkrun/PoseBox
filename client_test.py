@@ -3,6 +3,8 @@ import json
 import cv2
 import numpy as np
 import time
+import os
+import errno
 
 import posenet
 
@@ -34,6 +36,22 @@ if testing == 'posenet':
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+def record_poses(result, name):
+    file_path = os.path.join("./records/", name)
+    if not os.path.exists(file_path):
+        try:
+            os.makedirs(file_path)
+        except OSError as exc:
+            if exc.errno != errno.EEXIST:
+                raise
+    
+    np.save(os.path.join(file_path, "pose_scores"), np.array(result['pose_scores']))
+    np.save(os.path.join(file_path, "keypoint_scores"), np.array(result['keypoint_scores']))
+    np.save(os.path.join(file_path, "keypoint_coords"), np.array(result['keypoint_coords']))
+    
+    
+
+
 def run_cam():
     cap = cv2.VideoCapture(0)
     cap.set(3, 640)
@@ -59,6 +77,11 @@ def run_cam():
         
         cv2.imshow('posenet', overlay_image)
         frame_count += 1
+        if cv2.waitKey(1) & 0xFF == ord('s'):
+            name = input("Save pose as: ")
+            record_poses(result, name)
+            print("Saved!")
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     
