@@ -102,7 +102,7 @@ ENV/
 
 # models
 *ckpt*
-*.npy
+#*.npy
 timeline*.json
 *.pb
 *.pbtxt
@@ -121,3 +121,5 @@ src/pafprocess/pafprocess.py
 src/pafprocess/pafprocess_wrap.cpp
 src/pafprocess/pafprocess_wrap.cxx
 .vscode/
+images/
+buffer.py

@@ -28,6 +28,8 @@ def read_cap(cap, scale_factor=1.0, output_stride=16):
         raise IOError("webcam failure")
     return _process_input(img, scale_factor, output_stride)
 
+def process_input(source_img, scale_factor=1.0, output_stride=16):
+    return _process_input(source_img, scale_factor, output_stride)
 
 def read_imgfile(path, scale_factor=1.0, output_stride=16):
     img = cv2.imread(path)
