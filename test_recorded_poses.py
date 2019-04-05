@@ -7,10 +7,10 @@ from sklearn import preprocessing
 
 record_dir = './records'
 poses = [
-    'one-side',
-    'one-up',
+    #'one-side',
+    #'one-up',
     'st-pose',
-    'tri-pose'
+    #'tri-pose'
 ]
 
 """
@@ -52,11 +52,7 @@ def draw_keypoints_np(img, keypoint_scores, keypoint_coords, is_norm=False):
         return None
 
 def get_norm_coords(keypoint_coords):
-    res = []
-    for point in keypoint_coords:
-        res.append(point[0])
-        res.append(point[1])
-    return custom_norm(res)
+    return custom_norm(flatten(keypoint_coords))
 
 def custom_norm(vector):
     sq = np.square(vector)
@@ -67,34 +63,54 @@ def custom_norm(vector):
 def gather(vector):
     return np.reshape(vector, (-1, 2))
 
+def flatten(vector):
+    return np.reshape(vector, (1,-1))
 
-def load_pose_data():
+def load_pose_data(trim_head=False):
     poses_data = {}
     for pose in poses:
         pose_data = {}
         f_path = os.path.join(record_dir, pose)
-        #pose_data['pose_scores'] = np.load(os.path.join(f_path, "pose_scores.npy"))[0:1]
 
-        pose_data['keypoint_scores'] = np.load(os.path.join(f_path, "keypoint_scores.npy"))[0, :].tolist()
-        
-        keypoint_coords = np.load(os.path.join(f_path, "keypoint_coords.npy"))[0, :].tolist()
-        keypoint_coords_l2 = gather(get_norm_coords(keypoint_coords)).tolist()
-        pose_data['keypoint_coords'] = keypoint_coords
-        pose_data['keypoint_coords_l2'] = keypoint_coords_l2
+        pose_scores = np.load(os.path.join(f_path, "pose_scores.npy"))
+        keypoint_scores = np.load(os.path.join(f_path, "keypoint_scores.npy"))
+        keypoint_coords = np.load(os.path.join(f_path, "keypoint_coords.npy"))
 
-        poses_data[pose] = pose_data
+        poses_data[pose] = process_pose_data(pose_scores, keypoint_scores, keypoint_coords, trim_head=trim_head)
     return poses_data
 
 
+def process_pose_data(pose_scores, keypoint_scores, keypoint_coords, trim_head=True):
+    pose_data = {}
+
+    pose_scores = pose_scores[0:1].tolist()
+    keypoint_scores = keypoint_scores[0, :].tolist()
+    keypoint_coords = keypoint_coords[0, :].tolist()
+    keypoint_coords_l2 = gather(get_norm_coords(keypoint_coords)).tolist()
+
+    if trim_head:
+        pose_data['keypoint_scores'] = keypoint_scores[5:]
+        pose_data['keypoint_coords'] = keypoint_coords[5:]
+        pose_data['keypoint_coords_l2'] = keypoint_coords_l2[5:]
+    else:
+        pose_data['keypoint_scores'] = keypoint_scores
+        pose_data['keypoint_coords'] = keypoint_coords
+        pose_data['keypoint_coords_l2'] = keypoint_coords_l2
+    
+    return pose_data
+    
+
+
 def do_test():
-    data = load_pose_data()
+    data = load_pose_data(trim_head=True)
     #print(data)
     for pose in data.keys():
         image = np.zeros((480,640,3), np.uint8)
         image = draw_keypoints_np(
-            image, data[pose]['keypoint_scores'][5:], data[pose]['keypoint_coords_l2'][5:], is_norm=True)
+            image, data[pose]['keypoint_scores'], data[pose]['keypoint_coords'], is_norm=False)
         #cv2.imshow(pose, image)
-        #cv2.waitKey(0)
+    
+    #cv2.waitKey(0)
 
 
 
