@@ -2,15 +2,18 @@ import os
 import numpy as np
 import cv2
 from sklearn import preprocessing
+from sklearn.metrics.pairwise import cosine_similarity
+
+import matplotlib.pyplot as plt
 
 #import posenet
 
 record_dir = './records'
 poses = [
-    #'one-side',
-    #'one-up',
+    'one-side',
+    'one-up',
     'st-pose',
-    #'tri-pose'
+    'tri-pose'
 ]
 
 """
@@ -35,7 +38,11 @@ DATA FORMAT:
 
 """
 
-def draw_keypoints_np(img, keypoint_scores, keypoint_coords, is_norm=False):
+def draw_keypoints(img, pose_data, is_norm=False):
+    keypoint_scores = pose_data['keypoint_scores']
+    keypoint_coords = pose_data['keypoint_coords']
+    keypoint_coords_l2 = pose_data['keypoint_coords_l2']
+
     if not is_norm:
         cv_keypoints = []
         for ks, kc in zip(keypoint_scores, keypoint_coords):
@@ -44,9 +51,8 @@ def draw_keypoints_np(img, keypoint_scores, keypoint_coords, is_norm=False):
         return out_img
     else:
         #TODO: Implement plotting code for normalized coords
-        import matplotlib.pyplot as plt
 
-        for point in keypoint_coords:
+        for point in keypoint_coords_l2:
             plt.plot(point[1], -point[0], 'bo')
         plt.show()
         return None
@@ -98,19 +104,86 @@ def process_pose_data(pose_scores, keypoint_scores, keypoint_coords, trim_head=T
         pose_data['keypoint_coords_l2'] = keypoint_coords_l2
     
     return pose_data
-    
 
+def match_pose(pose1, pose2):
+    p1_data = flatten(pose1['keypoint_coords_l2'])
+    p2_data = flatten(pose2['keypoint_coords_l2'])
+
+    sim = cosine_similarity(p1_data, p2_data)[0]
+    dist = np.sqrt(2*(1-sim))
+
+    return dist
+
+def record_and_run(base_pose):
+    import requests
+    import json
+
+    testing = 'posenet'
+    addr = 'http://localhost:5000'
+    test_url = addr + '/{}'.format(testing)
+
+    content_type = 'image/jpeg'
+    headers = {'content_type': content_type}
+
+    cap = cv2.VideoCapture(1)
+    cap.set(3, 640)
+    cap.set(4, 480)
+    dist = 0.0
+
+    base_img = np.zeros((480,640,3), np.uint8)
+    base_img = draw_keypoints(
+        base_img, base_pose, is_norm=False)
+    cv2.imshow('pose', base_img)
+
+    while True:
+        _, img = cap.read()
+        _, img_encoded = cv2.imencode('.jpg', img)
+
+        response = requests.post(test_url, data=img_encoded.tostring(), headers=headers)
+        result = json.loads(response.text)
+
+        if not result["success"]:
+            continue
+        
+        pose_scores, keypoint_scores, keypoint_coords = np.array(result['pose_scores']), np.array(result['keypoint_scores']), np.array(result['keypoint_coords'])
+
+        pose_data = process_pose_data(pose_scores, keypoint_scores, keypoint_coords, trim_head=False)
+
+        if (pose_scores[0] > 0.1):
+            dist = match_pose(base_pose, pose_data)[0]
+
+        ### DRAW CODE
+        image = np.zeros((480,640,3), np.uint8)
+        image = draw_keypoints(image, pose_data, is_norm=False)
+
+        # Draw text
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        botLeftCorner = (0,50)
+        fontScale = 1
+        fontColor = (255,255,255)
+        lineType = 2
+
+        cv2.putText(image, str(dist)[:5], botLeftCorner, font, fontScale, fontColor, lineType)
+
+        cv2.imshow('video', image)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            return
 
 def do_test():
-    data = load_pose_data(trim_head=True)
+    data = load_pose_data(trim_head=False)
     #print(data)
+    """
     for pose in data.keys():
         image = np.zeros((480,640,3), np.uint8)
-        image = draw_keypoints_np(
-            image, data[pose]['keypoint_scores'], data[pose]['keypoint_coords'], is_norm=False)
-        #cv2.imshow(pose, image)
-    
-    #cv2.waitKey(0)
+        image = draw_keypoints(
+            image, data[pose], is_norm=False)
+        cv2.imshow(pose, image)
+    """
+
+    record_and_run(data['tri-pose'])
+
+    cv2.destroyAllWindows()
 
 
 
