@@ -114,6 +114,19 @@ def match_pose(pose1, pose2):
 
     return dist
 
+def match_pose_weighted(pose1, pose2):
+    p1_data = pose1['keypoint_coords_l2']
+    p2_data = pose2['keypoint_coords_l2']
+    p2_conf = pose2['keypoint_scores']
+
+    sum_p2_conf = np.sum(p2_conf)
+    sub = np.subtract(p2_data, p1_data)
+    sub_mag = [np.linalg.norm(point) for point in sub]
+    conf_sub_mag = np.dot(p2_conf, sub_mag)
+    dist = (1.0/sum_p2_conf) * conf_sub_mag
+
+    return dist
+
 def record_and_run(base_pose):
     import requests
     import json
@@ -129,6 +142,7 @@ def record_and_run(base_pose):
     cap.set(3, 640)
     cap.set(4, 480)
     dist = 0.0
+    dist2 = 0.0
 
     base_img = np.zeros((480,640,3), np.uint8)
     base_img = draw_keypoints(
@@ -151,6 +165,7 @@ def record_and_run(base_pose):
 
         if (pose_scores[0] > 0.1):
             dist = match_pose(base_pose, pose_data)[0]
+            dist2 = match_pose_weighted(base_pose, pose_data)
 
         ### DRAW CODE
         image = np.zeros((480,640,3), np.uint8)
@@ -163,7 +178,8 @@ def record_and_run(base_pose):
         fontColor = (255,255,255)
         lineType = 2
 
-        cv2.putText(image, str(dist)[:5], botLeftCorner, font, fontScale, fontColor, lineType)
+        cv2.putText(image, "c: {}, w: {}".format(str(dist)[:5], str(dist2)[:5]), botLeftCorner, font, fontScale, fontColor, lineType)
+
 
         cv2.imshow('video', image)
 
@@ -181,7 +197,7 @@ def do_test():
         cv2.imshow(pose, image)
     """
 
-    record_and_run(data['tri-pose'])
+    record_and_run(data['one-up'])
 
     cv2.destroyAllWindows()
 
