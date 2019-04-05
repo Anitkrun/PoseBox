@@ -51,11 +51,11 @@ def load_pose_data():
         #pose_data['pose_scores'] = np.load(os.path.join(f_path, "pose_scores.npy"))[0:1]
 
         pose_data['keypoint_scores'] = np.load(os.path.join(f_path, "keypoint_scores.npy"))[0, :].tolist()
-
-        #pose_data['keypoint_coords'] = np.load(os.path.join(f_path, "keypoint_coords.npy"))[0, :, :].tolist()
-        coords = np.load(os.path.join(f_path, "keypoint_coords.npy"))[0, :].tolist()
-        coords_l2 = preprocessing.normalize(coords, norm='l2').tolist()
-        pose_data['keypoint_coords'] = coords_l2
+        
+        keypoint_coords = np.load(os.path.join(f_path, "keypoint_coords.npy"))[0, :].tolist()
+        keypoint_coords_l2 = preprocessing.normalize(keypoint_coords, norm='l2').tolist()
+        pose_data['keypoint_coords'] = keypoint_coords
+        pose_data['keypoint_coords_l2'] = keypoint_coords_l2
 
         poses_data[pose] = pose_data
     return poses_data
